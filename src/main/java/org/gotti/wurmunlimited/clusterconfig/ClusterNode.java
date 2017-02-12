@@ -49,9 +49,9 @@ public class ClusterNode {
 		ConfigHelper intern = helper.getNode("internal");
 
 		this.internalIp = intern.getProperty("ip");
-		this.internalPort = Integer.parseInt(intern.getProperty("port"));
-		this.rmiPort = Integer.parseInt(intern.getProperty("rmi_port"));
-		this.registrationPort = Integer.parseInt(intern.getProperty("registration_port"));
+		this.internalPort = Integer.parseInt(intern.getProperty("port", "48010"));
+		this.rmiPort = Integer.parseInt(intern.getProperty("rmi_port", "7220"));
+		this.registrationPort = Integer.parseInt(intern.getProperty("registration_port", "7221"));
 		this.password = intern.getProperty("password");
 
 		this.rmiEnabled = Boolean.parseBoolean(helper.getProperty("rmi", "true"));
