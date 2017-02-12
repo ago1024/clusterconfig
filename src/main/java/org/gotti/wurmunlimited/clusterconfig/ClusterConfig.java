@@ -92,6 +92,9 @@ public class ClusterConfig {
 
 	public List<ClusterNode> getNeighbours(String serverName) {
 		List<ClusterNode> neighbours = new ArrayList<>();
+		if (getServerConfig(serverName).getNodeType() == NodeType.STANDALONE) {
+			return neighbours;
+		}
 		this.clusterNodes.forEach((name, node) -> {
 			if (!Objects.equals(name, serverName)) {
 				final ClusterNode neighbour = getServerConfig(name);
