@@ -9,39 +9,47 @@ import java.util.Objects;
 
 public class ClusterNode {
 
-	private NodeType nodeType;
+	private final NodeType nodeType;
 
-	private String name;
+	private final String name;
 
-	private int id;
+	private final int id;
 
-	private String password;
+	private final String password;
 
-	private String publicIp;
+	private final String publicIp;
 
-	private int gamePort;
+	private final int publicPort;
+	
+	private final String internalIp;
 
-	private int rmiPort;
+	private final int internalPort;
+	
+	private final int rmiPort;
 
-	private int rmiRegistration;
+	private final int registrationPort;
 
-	private boolean rmiEnabled;
+	private final boolean rmiEnabled;
 
-	private Map<Direction, String> directions;
+	private final Map<Direction, String> directions;
 
-	private Map<String, String> options;
+	private final Map<String, String> options;
 
 	public ClusterNode(String name, ConfigHelper helper) {
 		this.name = Objects.requireNonNull(name, "name");
 		this.nodeType = NodeType.parse(helper.getProperty("type"));
 		this.id = Integer.parseInt(helper.getProperty("id"));
-		this.password = helper.getProperty("password");
 
 		ConfigHelper pub = helper.getNode("public");
 		this.publicIp = pub.getProperty("ip");
-		this.gamePort = Integer.parseInt(pub.getProperty("game_port"));
-		this.rmiPort = Integer.parseInt(pub.getProperty("rmi_port"));
-		this.rmiRegistration = Integer.parseInt(pub.getProperty("rmi_registration"));
+		this.publicPort = Integer.parseInt(pub.getProperty("port"));
+		
+		ConfigHelper intern = helper.getNode("internal");
+		this.internalIp = intern.getProperty("ip");
+		this.internalPort = Integer.parseInt(intern.getProperty("port"));
+		this.rmiPort = Integer.parseInt(intern.getProperty("rmi_port"));
+		this.registrationPort = Integer.parseInt(intern.getProperty("registration_port"));
+		this.password = intern.getProperty("password");
 
 		this.rmiEnabled = Boolean.parseBoolean(helper.getProperty("rmi", "true"));
 
@@ -80,16 +88,24 @@ public class ClusterNode {
 		return publicIp;
 	}
 
-	public int getGamePort() {
-		return gamePort;
+	public int getPublicPort() {
+		return publicPort;
+	}
+	
+	public String getInternalIp() {
+		return internalIp;
+	}
+	
+	public int getInternalPort() {
+		return internalPort;
 	}
 
 	public int getRmiPort() {
 		return rmiPort;
 	}
 
-	public int getRmiRegistration() {
-		return rmiRegistration;
+	public int getRegistrationPort() {
+		return registrationPort;
 	}
 
 	public boolean isRmiEnabled() {
