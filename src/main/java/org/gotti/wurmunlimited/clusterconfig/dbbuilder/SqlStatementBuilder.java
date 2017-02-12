@@ -39,6 +39,10 @@ public class SqlStatementBuilder {
 		setParameter(i, Byte.toString(value));
 	}
 	
+	public void setIdentifier(int i, String identifier) {
+		setParameter(i, identifier);
+	}
+	
 	private void setParameter(int i, String parameter) {
 		if (parameters[i - 1] != null) {
 			throw new IllegalArgumentException("Setting parameter " + i + " twice");

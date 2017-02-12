@@ -28,7 +28,7 @@ public class ServerConfigBuilder {
 
 	private void registerServer() {
 		
-		SqlStatementBuilder ps2 = dbcon.prepareStatement("INSERT INTO SERVERS(SERVER, NAME, INTRASERVERADDRESS,INTRASERVERPORT,INTRASERVERPASSWORD,EXTERNALIP, EXTERNALPORT, LOCAL) SELECT ?,?,?,?,?,?,?,? WHERE NOT EXISTS (SELECT 1 FROM SERVERS WHERE SERVER=?);");
+		SqlStatementBuilder ps2 = dbcon.prepareStatement("INSERT INTO SERVERS(SERVER, NAME, INTRASERVERADDRESS,INTRASERVERPORT,INTRASERVERPASSWORD,EXTERNALIP, EXTERNALPORT, LOCAL) SELECT ?,?,?,?,?,?,?,? WHERE NOT EXISTS (SELECT 1 FROM SERVERS WHERE ?=?);");
 		ps2.setInt(1, node.getId());
 		ps2.setString(2, node.getName());
 		ps2.setString(3, this.node.getPublicIp());
@@ -37,10 +37,16 @@ public class ServerConfigBuilder {
 		ps2.setString(6, this.node.getPublicIp());
 		ps2.setString(7, Integer.toString(this.node.getGamePort()));
 		ps2.setBoolean(8, local);
-		ps2.setInt(9, node.getId());
+		if (local) {
+			ps2.setIdentifier(9, "LOCAL");
+			ps2.setBoolean(10, local);
+		} else {
+			ps2.setIdentifier(9, "SERVER");
+			ps2.setInt(10, node.getId());
+		}
 		ps2.executeUpdate();
 		
-		ps2 = dbcon.prepareStatement("UPDATE SERVERS SET SERVER=?,NAME=?,EXTERNALIP=?,EXTERNALPORT=?,INTRASERVERPASSWORD=?,INTRASERVERADDRESS=?,INTRASERVERPORT=?,ISTEST=?,LOGINSERVER=?,RMIPORT=?,REGISTRATIONPORT=? WHERE SERVER=?;");
+		ps2 = dbcon.prepareStatement("UPDATE SERVERS SET SERVER=?,NAME=?,EXTERNALIP=?,EXTERNALPORT=?,INTRASERVERPASSWORD=?,INTRASERVERADDRESS=?,INTRASERVERPORT=?,ISTEST=?,LOGINSERVER=?,RMIPORT=?,REGISTRATIONPORT=? WHERE ?=?;");
 		ps2.setInt(1, node.getId());
 		ps2.setString(2, node.getName());
 		ps2.setString(3, this.node.getPublicIp());
@@ -52,7 +58,13 @@ public class ServerConfigBuilder {
 		ps2.setBoolean(9, this.node.getNodeType().isLoginServer());
 		ps2.setString(10, Integer.toString(this.node.getRmiPort()));
 		ps2.setString(11, Integer.toString(this.node.getRmiRegistration()));
-		ps2.setInt(12, node.getId());
+		if (local) {
+			ps2.setIdentifier(12, "LOCAL");
+			ps2.setBoolean(13, local);
+		} else {
+			ps2.setIdentifier(12, "SERVER");
+			ps2.setInt(13, node.getId());
+		}
 		ps2.executeUpdate();
 
 	}
