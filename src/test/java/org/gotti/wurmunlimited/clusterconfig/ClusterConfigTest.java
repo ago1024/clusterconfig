@@ -18,4 +18,10 @@ public class ClusterConfigTest {
 	public void testMainVerify() throws Exception {
 		ClusterConfig.run("src\\test\\resources\\servers.yml", "--verify", "Adventure");
 	}
+	
+	@Test
+	public void testMainVerifyStandalone() throws Exception {
+		ClusterConfig.run("src\\test\\resources\\servers.yml", "--verify", "Standalone");
+	}
+	
 }

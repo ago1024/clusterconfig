@@ -7,10 +7,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -49,8 +51,15 @@ public class ClusterConfig {
 				ClusterNode clusterNode = new ClusterNode(serverName, server);
 				clusterNodes.put(serverName, clusterNode);
 			}
-
+			
 			this.clusterNodes = clusterNodes;
+			
+			Set<Integer> ids = new HashSet<>();
+			this.clusterNodes.forEach((name, node) -> {
+				if (node.getNodeType() != NodeType.STANDALONE && !ids.add(node.getId())) {
+					throw new IllegalArgumentException("duplicate id " + node.getId());
+				}
+			});
 
 		} catch (IOException e) {
 			throw new RuntimeException(e);
@@ -66,9 +75,18 @@ public class ClusterConfig {
 
 	public Map<Direction, ClusterNode> getDirections(String serverName) {
 		Map<Direction, ClusterNode> directions = new HashMap<>();
-		getServerConfig(serverName).getDirections().forEach((direction, name) -> {
-			directions.put(direction, Objects.requireNonNull(getServerConfig(name)));
+		final ClusterNode server = getServerConfig(serverName);
+		server.getDirections().forEach((direction, name) -> {
+			final ClusterNode neighbour = getServerConfig(name);
+			if (neighbour.getNodeType() == NodeType.STANDALONE) {
+				throw new IllegalArgumentException("Standalone server used in direction");
+			}
+			directions.put(direction, Objects.requireNonNull(neighbour));
 		});
+		
+		if (server.getNodeType() == NodeType.STANDALONE && !directions.isEmpty()) {
+			throw new IllegalArgumentException("Standalone server has neighbours");
+		}
 		return directions;
 	}
 
@@ -76,7 +94,10 @@ public class ClusterConfig {
 		List<ClusterNode> neighbours = new ArrayList<>();
 		this.clusterNodes.forEach((name, node) -> {
 			if (!Objects.equals(name, serverName)) {
-				neighbours.add(getServerConfig(name));
+				final ClusterNode neighbour = getServerConfig(name);
+				if (neighbour.getNodeType() != NodeType.STANDALONE) {
+					neighbours.add(neighbour);
+				}
 			}
 		});
 		return neighbours;
@@ -100,7 +121,11 @@ public class ClusterConfig {
 			System.out.println(new ServerConfigBuilder(serverConfig, true).toString());
 
 			List<ClusterNode> neighbours = config.getNeighbours(serverName);
-			neighbours.forEach(node -> System.out.println(new ServerConfigBuilder(node, false).toString()));
+			if (serverConfig.getNodeType() == NodeType.STANDALONE) {
+				System.out.println("DELETE FROM SERVERS WHERE LOCAL = 0");
+			} else {
+				neighbours.forEach(node -> System.out.println(new ServerConfigBuilder(node, false).toString()));
+			}
 
 			Map<Direction, ClusterNode> directions = config.getDirections(serverName);
 			System.out.println(new NeighbourConfigBuilder(serverConfig, directions).toString());

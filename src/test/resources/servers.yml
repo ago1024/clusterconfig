@@ -24,7 +24,7 @@ servers:
       south: Adventure
     rmi: true
   Adventure:
-    type: standalone
+    type: slave
     id: 3
     password: foobar
     public:
@@ -37,3 +37,15 @@ servers:
     options:
       NPCS: false
     rmi: true
+  Standalone:
+    type: standalone
+    id: 4
+    password: foobar
+    public:
+      ip: 192.168.26.245
+      game_port: 3727
+      rmi_port: 7726
+      rmi_registration: 7727
+    options:
+      NPCS: false
+    rmi: true    
