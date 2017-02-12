@@ -1,0 +1,39 @@
+servers:
+  Login:
+    type: login
+    id: 1
+    password: foobar
+    public:
+      ip: 192.168.26.245
+      game_port: 3724
+      rmi_port: 7720
+      rmi_registration: 7721
+    rmi: true
+    options:
+      NPCS: false
+  Creative:
+    type: slave
+    id: 2
+    password: foobar
+    public:
+      ip: 192.168.26.245
+      game_port: 3725
+      rmi_port: 7722
+      rmi_registration: 7723
+    directions:
+      south: Adventure
+    rmi: true
+  Adventure:
+    type: standalone
+    id: 3
+    password: foobar
+    public:
+      ip: 192.168.26.245
+      game_port: 3726
+      rmi_port: 7724
+      rmi_registration: 7725
+    directions:
+      north: Creative
+    options:
+      NPCS: false
+    rmi: true
