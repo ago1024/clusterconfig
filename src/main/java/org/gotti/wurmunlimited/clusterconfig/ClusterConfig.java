@@ -122,7 +122,7 @@ public class ClusterConfig {
 
 			List<ClusterNode> neighbours = config.getNeighbours(serverName);
 			if (serverConfig.getNodeType() == NodeType.STANDALONE) {
-				System.out.println("DELETE FROM SERVERS WHERE LOCAL = 0");
+				System.out.println("DELETE FROM SERVERS WHERE LOCAL = 0;");
 			} else {
 				neighbours.forEach(node -> System.out.println(new ServerConfigBuilder(node, false).toString()));
 			}
