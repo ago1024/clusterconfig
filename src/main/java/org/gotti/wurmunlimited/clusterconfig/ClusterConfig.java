@@ -107,6 +107,11 @@ public class ClusterConfig {
 		System.out.println(option + " " + value);
 	}
 	
+	private static void checkIps(ClusterNode node) {
+		node.getPublicIp();
+		node.getInternalIp();
+	}
+	
 	public static void run(String... args) throws ParseException {
 		CommandLineParser parser = new DefaultParser();
 		CommandLine cmd = parser.parse(OPTIONS, args);
@@ -133,8 +138,8 @@ public class ClusterConfig {
 			final String serverName = cmd.getOptionValue("v");
 			
 			ClusterConfig config = new ClusterConfig(Paths.get(cmd.getArgList().get(0)));
-			config.getServerConfig(serverName);
-			config.getNeighbours(serverName);
+			checkIps(config.getServerConfig(serverName));
+			config.getNeighbours(serverName).forEach(ClusterConfig::checkIps);
 			config.getDirections(serverName);
 		} else if (cmd.hasOption("i")  && cmd.getArgList().size() == 1) {
 			

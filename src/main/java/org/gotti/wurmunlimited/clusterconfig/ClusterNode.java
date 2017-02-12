@@ -1,5 +1,7 @@
 package org.gotti.wurmunlimited.clusterconfig;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -45,6 +47,7 @@ public class ClusterNode {
 		this.publicPort = Integer.parseInt(pub.getProperty("port"));
 		
 		ConfigHelper intern = helper.getNode("internal");
+
 		this.internalIp = intern.getProperty("ip");
 		this.internalPort = Integer.parseInt(intern.getProperty("port"));
 		this.rmiPort = Integer.parseInt(intern.getProperty("rmi_port"));
@@ -85,7 +88,11 @@ public class ClusterNode {
 	}
 
 	public String getPublicIp() {
-		return publicIp;
+		try {
+			return InetAddress.getByName(publicIp).getHostAddress();
+		} catch (UnknownHostException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public int getPublicPort() {
@@ -93,7 +100,11 @@ public class ClusterNode {
 	}
 	
 	public String getInternalIp() {
-		return internalIp;
+		try {
+			return InetAddress.getByName(internalIp).getHostAddress();
+		} catch (UnknownHostException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	public int getInternalPort() {
